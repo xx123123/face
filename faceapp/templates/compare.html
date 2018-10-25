@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>人脸比对</title>
+    <script type="text/javascript">
+
+        var loadImageFile1 = (function () {
+        if (window.FileReader) {
+            var oPreviewImg = null, oFReader = new window.FileReader(),
+            rFilter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
+
+
+        oFReader.onload = function (oFREvent) {
+          if (!oPreviewImg) {
+          var newPreview = document.getElementById("imagePreview1");
+          //alert(oFREvent.target);
+          oPreviewImg = new Image();
+          oPreviewImg.style.width = (newPreview.offsetWidth).toString() + "px";
+          oPreviewImg.style.height = (newPreview.offsetHeight).toString() + "px";
+          newPreview.appendChild(oPreviewImg);
+          }
+          oPreviewImg.src = oFREvent.target.result;
+          //alert(oPreviewImg.src);
+          //document.getElementById('feature').textContent = oPreviewImg.src;
+          document.getElementById('img1Base64').value = oPreviewImg.src;
+        };
+
+
+        return function () {
+          var aFiles = document.getElementById("imageInput1").files;
+
+          //alert(aFiles[0]);
+          if (aFiles.length === 0) { return; }
+          if (!rFilter.test(aFiles[0].type)) { alert("You must select a valid image file!"); return; }
+          oFReader.readAsDataURL(aFiles[0]);
+
+        }
+      }
+
+      if (navigator.appName === "Microsoft Internet Explorer") {
+        return function () {
+          alert(document.getElementById("imageInput1").value);
+          document.getElementById("imagePreview1").filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = document.getElementById("imageInput1").value;
+        }
+      }
+    })();
+
+    var loadImageFile2 = (function () {
+        if (window.FileReader) {
+            var oPreviewImg = null, oFReader = new window.FileReader(),
+            rFilter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
+
+
+        oFReader.onload = function (oFREvent) {
+          if (!oPreviewImg) {
+          var newPreview = document.getElementById("imagePreview2");
+          //alert(oFREvent.target);
+          oPreviewImg = new Image();
+          oPreviewImg.style.width = (newPreview.offsetWidth).toString() + "px";
+          oPreviewImg.style.height = (newPreview.offsetHeight).toString() + "px";
+          newPreview.appendChild(oPreviewImg);
+          }
+          oPreviewImg.src = oFREvent.target.result;
+          //alert(oPreviewImg.src);
+          //document.getElementById('feature').textContent = oPreviewImg.src;
+          document.getElementById('img2Base64').value = oPreviewImg.src;
+        };
+
+
+        return function () {
+          var aFiles = document.getElementById("imageInput2").files;
+
+          //alert(aFiles[0]);
+          if (aFiles.length === 0) { return; }
+          if (!rFilter.test(aFiles[0].type)) { alert("You must select a valid image file!"); return; }
+          oFReader.readAsDataURL(aFiles[0]);
+
+        }
+      }
+
+      if (navigator.appName === "Microsoft Internet Explorer") {
+        return function () {
+          alert(document.getElementById("imageInput2").value);
+          document.getElementById("imagePreview2").filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = document.getElementById("imageInput2").value;
+        }
+      }
+    })();
+    </script>
+    <style type="text/css">
+        #imagePreview1{
+            width: 160px;
+            height: 120px;
+            filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale);
+        }
+        #imagePreview2{
+            width: 160px;
+            height: 120px;
+            filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale);
+        }
+
+    </style>
+    {% load staticfiles %}
+    {% load bootstrap3 %}
+</head>
+<body>
+    <div align="center">
+        <div id="imagePreview1">
+        </div>
+        <form name="uploadForm1">
+            <p>
+                <input id="imageInput1" type="file" name="myPhoto1" onchange="loadImageFile1();"/>
+            </p>
+        </form>
+
+        <div id="imagePreview2">
+        </div>
+        <form name="uploadForm1">
+            <p>
+                <input id="imageInput2" type="file" name="myPhoto2" onchange="loadImageFile2();"/>
+            </p>
+        </form>
+        <form method="post" action="/faceCompare/">
+            <input name="img1Base64" id="img1Base64" type="text" placeholder="图像1"><br>
+            <input name="img2Base64" id="img2Base64" type="text" placeholder="图像2"><br>
+            <button id="faceCompare" type="submit">人脸比对</button>
+            {% csrf_token %}
+        </form>
+        <div>
+            {% if score %}
+            比对分数：
+            {{score}}
+            <br>
+            比对结果：
+            {{result}}
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

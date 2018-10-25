@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>特征点提取</title>
+    <script type="text/javascript">
+
+        var loadImageFile = (function () {
+        if (window.FileReader) {
+            var oPreviewImg = null, oFReader = new window.FileReader(),
+            rFilter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
+
+
+        oFReader.onload = function (oFREvent) {
+          if (!oPreviewImg) {
+          var newPreview = document.getElementById("imagePreview");
+          //alert(oFREvent.target);
+          oPreviewImg = new Image();
+          oPreviewImg.style.width = (newPreview.offsetWidth).toString() + "px";
+          oPreviewImg.style.height = (newPreview.offsetHeight).toString() + "px";
+          newPreview.appendChild(oPreviewImg);
+          }
+          oPreviewImg.src = oFREvent.target.result;
+          //document.getElementById('feature').textContent = oPreviewImg.src;
+          document.getElementById('imageBase64').value = oPreviewImg.src;
+        };
+
+
+        return function () {
+          var aFiles = document.getElementById("imageInput").files;
+
+          //alert(aFiles[0]);
+          if (aFiles.length === 0) { return; }
+          if (!rFilter.test(aFiles[0].type)) { alert("You must select a valid image file!"); return; }
+          oFReader.readAsDataURL(aFiles[0]);
+
+        }
+      }
+
+      if (navigator.appName === "Microsoft Internet Explorer") {
+        return function () {
+          alert(document.getElementById("imageInput").value);
+          document.getElementById("imagePreview").filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = document.getElementById("imageInput").value;
+        }
+      }
+    })();
+    </script>
+    <style type="text/css">
+        #imagePreview{
+            width: 320px;
+            height: 240px;
+            filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale);
+        }
+    </style>
+    {% load staticfiles %}
+    {% load bootstrap3 %}
+</head>
+<body>
+    <div align="center">
+    <div id="imagePreview">
+    </div>
+    <form name="uploadForm">
+        <p>
+            <input id="imageInput" type="file" name="myPhoto" onchange="loadImageFile();"/>
+        </p>
+    </form>
+    <form method="post" action="/getFeature/">
+        <input name="imageBase64" id="imageBase64" type="text" placeholder="图像"><br>
+        <button id="getFeature" type="submit">获取特征</button>
+        {% csrf_token %}
+    </form>
+    {% if feature %}
+    <div id="feature">
+        <img src="{%static 'tmp1.jpg'%}" width="640px" height="480px">
+    </div>
+    {% endif %}
+    </div>
+</body>
+</html>
